@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Git Master Quest - Gioco Didattico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .banner {
+            border: 2px solid #00ff88;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 10px;
+        }
+
+        .banner h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #00ff88;
+            text-shadow: 0 0 10px #00ff88;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 1.2em;
+        }
+
+        .level {
+            color: #ffaa00;
+        }
+
+        .score {
+            color: #00ff88;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 4px solid #00ff88;
+        }
+
+        .quiz-section {
+            border-left-color: #ffaa00;
+        }
+
+        .practice-section {
+            border-left-color: #00aaff;
+        }
+
+        .danger-section {
+            border-left-color: #ff4444;
+        }
+
+        .success-section {
+            border-left-color: #00ff88;
+        }
+
+        h2 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #ffaa00;
+            margin-bottom: 10px;
+            font-size: 1.4em;
+        }
+
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #00ff88;
+            transform: translateX(10px);
+        }
+
+        .quiz-option.correct {
+            background: rgba(0, 255, 136, 0.3);
+            border-color: #00ff88;
+        }
+
+        .quiz-option.incorrect {
+            background: rgba(255, 68, 68, 0.3);
+            border-color: #ff4444;
+        }
+
+        .command-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff88;
+            border-radius: 5px;
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+
+        .command-input:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff4444, #cc0000);
+            color: #fff;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ffaa00, #cc8800);
+            color: #000;
+        }
+
+        .btn-info {
+            background: linear-gradient(45deg, #00aaff, #0088cc);
+            color: #fff;
+        }
+
+        .output {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #00ff88;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .success { color: #00ff88; }
+        .error { color: #ff4444; }
+        .warning { color: #ffaa00; }
+        .info { color: #00aaff; }
+        .purple { color: #aa00ff; }
+
+        .hidden {
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00aaff);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .scenario-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #00ff88;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 255, 136, 0.3);
+            border-color: #ffaa00;
+        }
+
+        .emoji {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #00ff88;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .conflict-marker {
+            color: #ff4444;
+            font-weight: bold;
+        }
+
+        .terminal {
+            background: #000;
+            color: #00ff88;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            border: 2px solid #00ff88;
+            margin: 15px 0;
+        }
+
+        .terminal-prompt::before {
+            content: "$ ";
+            color: #ffaa00;
+        }
+
+        @keyframes glow {
+            0% { text-shadow: 0 0 5px currentColor; }
+            50% { text-shadow: 0 0 20px currentColor; }
+            100% { text-shadow: 0 0 5px currentColor; }
+        }
+
+        .glow {
+            animation: glow 2s infinite;
+        }
+
+        .tips {
+            background: rgba(255, 170, 0, 0.1);
+            border: 2px solid #ffaa00;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .tips h4 {
+            color: #ffaa00;
+            margin-bottom: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .banner h1 {
+                font-size: 1.8em;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="banner">
+            <h1>🎮 GIT MASTER QUEST 🎮</h1>
+            <p>Impara Git attraverso sfide pratiche!</p>
+            <div class="stats">
+                <div class="level">Livello: <span id="currentLevel">1</span></div>
+                <div class="score">Punteggio: <span id="currentScore">0</span></div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div id="gameContent">
+            <!-- Il contenuto del gioco verrà inserito qui dinamicamente -->
+        </div>
+
+        <div class="footer">
+            <p>🚀 Git Master Quest - Impara Git in modo divertente!</p>
+            <p>💡 Tip: Git è uno strumento potente - usalo con saggezza!</p>
+        </div>
+    </div>
+
+    <script>
+        class GitMasterQuest {
+            constructor() {
+                this.level = 1;
+                this.score = 0;
+                this.maxLevel = 8;
+                this.gameContent = document.getElementById('gameContent');
+                this.currentLevelSpan = document.getElementById('currentLevel');
+                this.currentScoreSpan = document.getElementById('currentScore');
+                this.progressBar = document.getElementById('progressBar');
+
+                this.updateDisplay();
+                this.startGame();
+            }
+
+            updateDisplay() {
+                this.currentLevelSpan.textContent = this.level;
+                this.currentScoreSpan.textContent = this.score;
+                const progress = (this.level / this.maxLevel) * 100;
+                this.progressBar.style.width = progress + '%';
+            }
+
+            addScore(points) {
+                this.score += points;
+                this.updateDisplay();
+            }
+
+            nextLevel() {
+                this.level++;
+                this.updateDisplay();
+            }
+
+            startGame() {
+                this.gameContent.innerHTML = `
+                    <div class="section">
+                        <h2>🎯 Benvenuto in Git Master Quest!</h2>
+                        <p>Questo gioco ti insegnerà Git attraverso sfide pratiche e divertenti.</p>
+                        <p><strong>Cosa imparerai:</strong></p>
+                        <ul style="margin: 15px 0; padding-left: 30px;">
+                            <li>📚 Comandi fondamentali di Git</li>
+                            <li>🌳 Gestione dei branch</li>
+                            <li>💥 Risoluzione dei conflitti</li>
+                            <li>🚨 Scenari di emergenza</li>
+                            <li>⚡ Comandi avanzati e pericolosi</li>
+                        </ul>
+                        <button class="btn" onclick="game.level1Basics()">🚀 Inizia l'Avventura!</button>
+                    </div>
+                `;
+            }
+
+            level1Basics() {
+                this.gameContent.innerHTML = `
+                    <div class="section quiz-section">
+                        <h2>🏁 LIVELLO 1: I Fondamentali di Git</h2>
+                        <p>Iniziamo con i comandi base!</p>
+
+                        <h3>📚 Quiz 1: Inizializzazione Repository</h3>
+                        <p>Quale comando inizializza un nuovo repository Git?</p>
+
+                        <div class="quiz-option" onclick="this.classList.add('incorrect'); game.showFeedback('❌ Sbagliato! git start non esiste.', 'error')">
+                            a) git start
+                        </div>
+                        <div class="quiz-option" onclick="this.classList.add('correct'); game.showFeedback('✅ Corretto! git init crea un nuovo repository Git.', 'success'); game.addScore(10); setTimeout(() => game.practiceGitInit(), 2000)">
+                            b) git init
+                        </div>
+                        <div class="quiz-option" onclick="this.classList.add('incorrect'); game.showFeedback('❌ Sbagliato! git begin non esiste.', 'error')">
+                            c) git begin
+                        </div>
+
+                        <div id="feedback"></div>
+                    </div>
+                `;
+            }
+
+            practiceGitInit() {
+                this.gameContent.innerHTML = `
+                    <div class="section practice-section">
+                        <h2>🛠️ Pratica: git init</h2>
+                        <p>Ora scriviamo il comando per inizializzare un repository:</p>
+
+                        <div class="terminal">
+                            <div class="terminal-prompt">
+                                <input type="text" class="command-input" id="gitInitCommand"
+                                       placeholder="Scrivi il comando git per inizializzare un repository..."
+                                       onkeypress="if(event.key==='Enter') game.checkGitInit()">
+                            </div>
+                        </div>
+
+                        <button class="btn" onclick="game.checkGitInit()">✅ Verifica Comando</button>
+
+                        <div id="commandFeedback"></div>
+                    </div>
+                `;
+                document.getElementById('gitInitCommand').focus();
+            }
+
+            checkGitInit() {
+                const command = document.getElementById('gitInitCommand').value.trim();
+                const feedback = document.getElementById('commandFeedback');
+
+                if (command === 'git init') {
+                    feedback.innerHTML = `
+                        <div class="output success">
+                            ✅ Perfetto! Repository Git inizializzato!
+
+                            Output simulato:
+                            Initialized empty Git repository in /mnt/c/ProgettoGit/.git/
+                        </div>
+                    `;
+                    this.addScore(20);
+                    setTimeout(() => this.gitStatusQuiz(), 3000);
+                } else {
+                    feedback.innerHTML = `
+                        <div class="output error">
+                            ❌ Comando errato! Il comando corretto è: git init
+
+                            Riprova!
+                        </div>
+                    `;
+                    document.getElementById('gitInitCommand').value = '';
+                    document.getElementById('gitInitCommand').focus();
+                }
+            }
+
+            gitStatusQuiz() {
+                this.gameContent.innerHTML = `
+                    <div class="section quiz-section">
+                        <h3>📚 Quiz 2: Controllo dello Stato</h3>
+                        <p>Immagina di aver creato un file README.md. Quale comando mostra lo stato del repository?</p>
+
+                        <div class="terminal">
+                            <div class="terminal-prompt">
+                                <input type="text" class="command-input" id="statusCommand"
+                                       placeholder="Quale comando mostra lo stato del repository?"
+                                       onkeypress="if(event.key==='Enter') game.checkGitStatus()">
+                            </div>
+                        </div>
+
+                        <button class="btn" onclick="game.checkGitStatus()">✅ Verifica</button>
+
+                        <div id="statusFeedback"></div>
+                    </div>
+                `;
+                document.getElementById('statusCommand').focus();
+            }
+
+            checkGitStatus() {
+                const command = document.getElementById('statusCommand').value.trim();
+                const feedback = document.getElementById('statusFeedback');
+
+                if (command === 'git status') {
+                    feedback.innerHTML = `
+                        <div class="output success">
+                            ✅ Perfetto! git status mostra lo stato del repository.
+
+                            Output simulato:
+                            On branch main
+
+                            No commits yet
+
+                            Untracked files:
+                              (use "git add &lt;file&gt;..." to include in what will be committed)
+                                README.md
+
+                            nothing added to commit but untracked files present
+                        </div>
+                    `;
+                    this.addScore(15);
+                    setTimeout(() => this.gitAddQuiz(), 3000);
+                } else {
+                    feedback.innerHTML = `
+                        <div class="output error">
+                            ❌ Riprova! Il comando per vedere lo stato è git status
+                        </div>
+                    `;
+                    document.getElementById('statusCommand').value = '';
+                }
+            }
+
+            gitAddQuiz() {
+                this.gameContent.innerHTML = `
+                    <div class="section practice-section">
+                        <h3>📚 Quiz 3: Staging Area</h3>
+                        <p>Il file README.md è "untracked". Come lo aggiungiamo al staging area?</p>
+
+                        <div class="terminal">
+                            <div class="terminal-prompt">
+                                <input type="text" class="command-input" id="addCommand"
+                                       placeholder="Comando per aggiungere README.md al staging..."
+                                       onkeypress="if(event.key==='Enter') game.checkGitAdd()">
+                            </div>
+                        </div>
+
+                        <button class="btn" onclick="game.checkGitAdd()">✅ Verifica</button>
+
+                        <div class="tips">
+                            <h4>💡 Suggerimento:</h4>
+                            <p>Puoi usare <code>git add README.md</code> per un file specifico o <code>git add .</code> per tutti i file.</p>
+                        </div>
+
+                        <div id="addFeedback"></div>
+                    </div>
+                `;
+                document.getElementById('addCommand').focus();
+            }
+
+            checkGitAdd() {
+                const command = document.getElementById('addCommand').value.trim();
+                const feedback = document.getElementById('addFeedback');
+
+                if (command === 'git add README.md' || command === 'git add .') {
+                    feedback.innerHTML = `
+                        <div class="output success">
+                            ✅ Ottimo! File aggiunto al staging area!
+
+                            Il file è ora pronto per il commit.
+                        </div>
+                    `;
+                    this.addScore(15);
+                    setTimeout(() => this.gitCommitQuiz(), 2000);
+                } else {
+                    feedback.innerHTML = `
+                        <div class="output error">
+                            ❌ Riprova! Usa: git add README.md oppure git add .
+                        </div>
+                    `;
+                    document.getElementById('addCommand').value = '';
+                }
+            }
+
+            gitCommitQuiz() {
+                this.gameContent.innerHTML = `
+                    <div class="section practice-section">
+                        <h3>📚 Quiz 4: Il Primo Commit</h3>
+                        <p>Ora facciamo il commit! Scrivi un comando con un messaggio descrittivo:</p>
+
+                        <div class="terminal">
+                            <div class="terminal-prompt">
+                                <input type="text" class="command-input" id="commitCommand"
+                                       placeholder='git commit -m "il tuo messaggio"'
+                                       onkeypress="if(event.key==='Enter') game.checkGitCommit()">
+                            </div>
+                        </div>
+
+                        <button class="btn" onclick="game.checkGitCommit()">✅ Verifica</button>
+
+                        <div class="tips">
+                            <h4>💡 Buone Pratiche per i Messaggi di Commit:</h4>
+                            <ul>
+                                <li>Usa il presente imperativo: "Aggiunge" non "Aggiunto"</li>
+                                <li>Sii specifico e chiaro</li>
+                                <li>Massimo 50 caratteri per il titolo</li>
+                            </ul>
+                        </div>
+
+                        <div id="commitFeedback"></div>
+                    </div>
+                `;
+                document.getElementById('commitCommand').focus();
+            }
+
+            checkGitCommit() {
+                const command = document.getElementById('commitCommand').value.trim();
+                const feedback = document.getElementById('commitFeedback');
+
+                if (command.startsWith('git commit -m') && command.includes('"')) {
+                    feedback.innerHTML = `
+                        <div class="output success">
+                            ✅ Perfetto! Primo commit creato!
+
+                            Output simulato:
+                            [main (root-commit) a1b2c3d] ${command.split('"')[1]}
+                             1 file changed, 3 insertions(+)
+                             create mode 100644 README.md
+                        </div>
+                    `;
+                    this.addScore(25);
+                    setTimeout(() => this.level1Complete(), 3000);
+                } else {
+                    feedback.innerHTML = `
+                        <div class="output error">
+                            ❌ Formato errato! Usa: git commit -m "il tuo messaggio"
+
+                            Ricorda le virgolette attorno al messaggio!
+                        </div>
+                    `;
+                    document.getElementById('commitCommand').value = '';
+                }
+            }
+
+            level1Complete() {
+                this.nextLevel();
+                this.gameContent.innerHTML = `
+                    <div class="section success-section">
+                        <h2>🎉 LIVELLO 1 COMPLETATO!</h2>
+                        <p><strong>Punteggio attuale: ${this.score}</strong></p>
+
+                        <h3>📚 Cosa hai imparato:</h3>
+                        <ul style="margin: 15px 0; padding-left: 30px;">
+                            <li>✅ <code>git init</code> - Inizializza un repository</li>
+                            <li>✅ <code>git status</code> - Mostra lo stato dei file</li>
+                            <li>✅ <code>git add</code> - Aggiunge file al staging area</li>
+                            <li>✅ <code>git commit -m</code> - Crea un commit con messaggio</li>
+                        </ul>
+
+                        <div class="tips">
+                            <h4>🎯 Workflow Git Base:</h4>
+                            <p>1. Modifica file → 2. git add → 3. git commit → 4. Ripeti!</p>
+                        </div>
+
+                        <button class="btn" onclick="game.level2Branching()">🌳 Livello 2: Branching!</button>
+                    </div>
+                `;
+            }
+
+            level2Branching() {
+                this.gameContent.innerHTML = `
+                    <div class="section">
+                        <h2>🌳 LIVELLO 2: BRANCHING E CONFLITTI</h2>
+                        <p>Ora impariamo una delle funzionalità più potenti di Git: i branch!</p>
+
+                        <h3>📚 Cosa sono i Branch?</h3>
+                        <p>I branch permettono di lavorare su features separate senza interferire con il codice principale.</p>
+
+                        <div class="code-block">
+main     ●────●────●────●
+              ╲
+feature        ●────●  (lavoro parallelo)
+                    ╱
+main     ●────●────●────●──✓ (merge)
+                        </div>
+
+                        <h3>🎯 Quiz: Creazione Branch</h3>
+                        <p>Quale comando crea un nuovo branch chiamato 'feature'?</p>
+
+                        <div class="quiz-option" onclick="this.classList.add('correct'); game.showFeedback('✅ Corretto! Crea il branch ma non ci entra.', 'success'); game.addScore(10); setTimeout(() => game.branchingPractice(), 2000)">
+                            a) git branch feature
+                        </div>
+                        <div class="quiz-option" onclick="this.classList.add('correct'); game.showFeedback('✅ Perfetto! Crea e entra nel branch in un comando!', 'success'); game.addScore(15); setTimeout(() => game.branchingPractice(), 2000)">
+                            b) git checkout -b feature
+                        </div>
+                        <div class="quiz-option" onclick="this.classList.add('correct'); game.showFeedback('✅ Ottimo! Comando moderno equivalente a checkout -b', 'success'); game.addScore(15); setTimeout(() => game.branchingPractice(), 2000)">
+                            c) git switch -c feature
+                        </div>
+                        <div class="quiz-option" onclick="this.classList.add('incorrect'); game.showFeedback('❌ Sbagliato! Questo comando non esiste.', 'error')">
+                            d) git create feature
+                        </div>
+
+                        <div id="feedback"></div>
+                    </div>
+                `;
+            }
+
+            branchingPractice() {
+                this.gameContent.innerHTML = `
+                    <div class="section practice-section">
+                        <h3>🛠️ Pratica: Gestione Branch</h3>
+                        <p>Simuliamo la creazione di un branch e le modifiche...</p>
+
+                        <div class="terminal">
+                            <p>$ git checkout -b feature</p>
+                            <p class="success">Switched to a new branch 'feature'</p>
+                            <br>
+                            <p>$ git branch</p>
+                            <p>  main</p>
+                            <p class="success">* feature</p>
+                        </div>
+
+                        <p>Ora sei nel branch 'feature'. Immagina di aver modificato README.md aggiungendo una nuova sezione.</p>
+
+                        <div class="tips">
+                            <h4>💡 Comandi Branch Utili:</h4>
+                            <ul>
+                                <li><code>git branch</code> - Lista tutti i branch</li>
+                                <li><code>git branch -d nome</code> - Cancella un branch</li>
+                                <li><code>git checkout nome</code> - Cambia branch</li>
+                                <li><code>git switch nome</code> - Comando moderno per cambiare branch</li>
+                            </ul>
+                        </div>
+
+                        <button class="btn" onclick="game.conflictSetup()">💥 Creiamo un Conflitto!</button>
+                    </div>
+                `;
+            }
+
+            conflictSetup() {
+                this.gameContent.innerHTML = `
+                    <div class="section danger-section">
+                        <h2>💥 SIMULAZIONE CONFLITTO DI MERGE</h2>
+                        <p>Ora creiamo una situazione reale che ogni sviluppatore affronta: un conflitto di merge!</p>
+
+                        <h3>📚 La Situazione:</h3>
+                        <ol style="margin: 15px 0; padding-left: 30px;">
+                            <li>Sei nel branch 'feature' e modifichi README.md</li>
+                            <li>Nel frattempo, qualcun altro modifica lo stesso file in 'main'</li>
+                            <li>Quando provi a fare merge... CONFLITTO! 💥</li>
+                        </ol>
+
+                        <div class="terminal">
+                            <p># Nel branch feature:</p>
+                            <p>$ echo "## Nuova Feature" >> README.md</p>
+                            <p>$ git commit -am "Aggiunta nuova feature"</p>
+                            <br>
+                            <p># Torniamo a main:</p>
+                            <p>$ git checkout main</p>
+                            <p>$ echo "## Aggiornamento Importante" >> README.md</p>
+                            <p>$ git commit -am "Aggiornamento in main"</p>
+                            <br>
+                            <p># Proviamo il merge:</p>
+                            <p>$ git merge feature</p>
+                            <p class="error">CONFLICT (content): Merge conflict in README.md</p>
+                            <p class="error">Automatic merge failed; fix conflicts and then commit the result.</p>
+                        </div>
+
+                        <button class="btn btn-danger" onclick="game.showConflict()">😱 Vediamo il Conflitto!</button>
+                    </div>
+                `;
+            }
+
+            showConflict() {
+                this.gameContent.innerHTML = `
+                    <div class="section danger-section">
+                        <h2>🔍 ANALISI DEL CONFLITTO</h2>
+                        <p>Ecco come appare il file README.md con il conflitto:</p>
+
+                        <div class="code-block">
+# Il Mio Primo Progetto Git
+
+Questo è un file di esempio per imparare Git!
+
+<span class="conflict-marker">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</span>
+## Aggiornamento Importante
+<span class="conflict-marker">=======</span>
+## Nuova Feature
+<span class="conflict-marker">&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature</span>
+                        </div>
+
+                        <h3>🎓 LEZIONE SUI MARKER DI CONFLITTO:</h3>
+                        <ul style="margin: 15px 0; padding-left: 30px;">
+                            <li><span class="conflict-marker">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</span> - Inizio della versione corrente (main)</li>
+                            <li><span class="conflict-marker">=======</span> - Separatore tra le versioni</li>
+                            <li><span class="conflict-marker">&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature</span> - Fine della versione in arrivo (feature)</li>
+                        </ul>
+
+                        <h3>🛠️ Come Risolviamo?</h3>
+                        <p>Dobbiamo scegliere cosa tenere e rimuovere i marker. Quale versione vuoi mantenere?</p>
+
+                        <div class="scenario-grid">
+                            <div class="scenario-card" onclick="game.resolveConflict('main')">
+                                <div class="emoji">🏠</div>
+                                <h4>Solo Main</h4>
+                                <p>Mantieni solo "Aggiornamento Importante"</p>
+                            </div>
+                            <div class="scenario-card" onclick="game.resolveConflict('feature')">
+                                <div class="emoji">⭐</div>
+                                <h4>Solo Feature</h4>
+                                <p>Mantieni solo "Nuova Feature"</p>
+                            </div>
+                            <div class="scenario-card" onclick="game.resolveConflict('both')">
+                                <div class="emoji">🤝</div>
+                                <h4>Entrambi</h4>
+                                <p>Combina le due versioni</p>
+                            </div>
+                            <div class="scenario-card" onclick="game.resolveConflict('custom')">
+                                <div class="emoji">✏️</div>
+                                <h4>Personalizzato</h4>
+                                <p>Scrivi qualcosa di nuovo</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            resolveConflict(choice) {
+                let resolvedContent = '';
+                let description = '';
+
+                switch(choice) {
+                    case 'main':
+                        resolvedContent = `# Il Mio Primo Progetto Git
+
+Questo è un file di esempio per imparare Git!
+
+## Aggiornamento Importante`;
+                        description = 'Hai scelto di mantenere solo la versione di main.';
+                        break;
+                    case 'feature':
+                        resolvedContent = `# Il Mio Primo Progetto Git
+
+Questo è un file di esempio per imparare Git!
+
+## Nuova Feature`;
+                        description = 'Hai scelto di mantenere solo la versione di feature.';
+                        break;
+                    case 'both':
+                        resolvedContent = `# Il Mio Primo Progetto Git
+
+Questo è un file di esempio per imparare Git!
+
+## Aggiornamento Importante
+
+## Nuova Feature`;
+                        description = 'Hai combinato entrambe le versioni - ottima scelta per non perdere lavoro!';
+                        break;
+                    case 'custom':
+                        resolvedContent = `# Il Mio Primo Progetto Git
+
+Questo è un file di esempio per imparare Git!
+
+## Versione Unificata
+Ho combinato le migliori parti di entrambe le versioni!`;
+                        description = 'Hai scritto una versione completamente nuova - molto creativo!';
+                        break;
+                }
+
+                this.gameContent.innerHTML = `
+                    <div class="section success-section">
+                        <h2>✅ CONFLITTO RISOLTO!</h2>
+                        <p>${description}</p>
+
+                        <h3>📄 File Risolto:</h3>
+                        <div class="code-block">${resolvedContent}</div>
+
+                        <h3>🔧 Passi per Completare il Merge:</h3>
+                        <div class="terminal">
+                            <p class="terminal-prompt">git add README.md</p>
+                            <p class="terminal-prompt">git commit -m "Risolto conflitto merge"</p>
+                            <p class="success">[main abc123d] Risolto conflitto merge</p>
+                        </div>
+
+                        <div class="tips">
+                            <h4>🎯 Riassunto Risoluzione Conflitti:</h4>
+                            <ol>
+                                <li>📖 Apri il file e trova i marker (&lt;&lt;&lt;, ===, &gt;&gt;&gt;)</li>
+                                <li>🔧 Modifica il contenuto come desideri</li>
+                                <li>🗑️ Rimuovi TUTTI i marker di conflitto</li>
+                                <li>➕ <code>git add</code> del file risolto</li>
+                                <li>✅ <code>git commit</code> per completare il merge</li>
+                            </ol>
+                        </div>
+
+                        <button class="btn" onclick="game.level2Complete()">🎉 Completa Livello 2!</button>
+                    </div>
+                `;
+                this.addScore(50);
+            }
+
+            level2Complete() {
+                this.nextLevel();
+                this.gameContent.innerHTML = `
+                    <div class="section success-section">
+                        <h2>🏆 LIVELLO 2 COMPLETATO!</h2>
+                        <p><strong>Punteggio totale: ${this.score}</strong></p>
+
+                        <h3>🎓 Hai Masterizzato:</h3>
+                        <ul style="margin: 15px 0; padding-left: 30px;">
+                            <li>✅ Creazione e gestione branch</li>
+                            <li>✅ Identificazione dei conflitti di merge</li>
+                            <li>✅ Risoluzione manuale dei conflitti</li>
+                            <li>✅ Workflow branch-merge completo</li>
+                        </ul>
+
+                        <div class="tips">
+                            <h4>💡 Best Practices per i Branch:</h4>
+                            <ul>
+                                <li>Un branch = una feature</li>
+                                <li>Nomi descrittivi: feature/login, bugfix/memory-leak</li>
+                                <li>Merge frequenti per evitare conflitti grandi</li>
+                                <li>Cancella i branch dopo il merge</li>
+                            </ul>
+                        </div>
+
+                        <button class="btn" onclick="game.emergencyScenarios()">🚨 Scenari di Emergenza!</button>
+                    </div>
+                `;
+            }
+
+            emergencyScenarios() {
+                this.gameContent.innerHTML = `
+                    <div class="section">
+                        <h2>🚨 SCENARI DI EMERGENZA E RECOVERY</h2>
+                        <p>Ora affrontiamo situazioni reali che possono succedere (e succedono!) a tutti gli sviluppatori.</p>
+
+                        <div class="scenario-grid">
+                            <div class="scenario-card" onclick="game.wrongBranchScenario()">
+                                <div class="emoji">😱</div>
+                                <h4>Commit Sbagliato</h4>
+                                <p>"Ho fatto commit nel branch sbagliato!"</p>
+                            </div>
+                            <div class="scenario-card" onclick="game.wrongPushScenario()">
+                                <div class="emoji">🔥</div>
+                                <h4>Push Pericoloso</h4>
+                                <p>"Ho fatto push di credenziali!"</p>
+                            </div>
+                            <div class="scenario-card" onclick="game.deletedFilesScenario()">
+                                <div class="emoji">💀</div>
+                                <h4>File Cancellati</h4>
+                                <p>"Ho cancellato file importanti!"</p>
+                            </div>
+                            <div class="scenario-card" onclick="game.undoCommitScenario()">
+                                <div class="emoji">⚡</div>
+                                <h4>Annulla Commit</h4>
+                                <p>"Come annullo l'ultimo commit?"</p>
+                            </div>
+                            <div class="scenario-card" onclick="game.dangerousCommandsLesson()">
+                                <div class="emoji">☠️</div>
+                                <h4>Comandi Pericolosi</h4>
+                                <p>"Cosa NON devo mai fare?"</p>
+                            </div>
+                            <div class="scenario-card" onclick="game.finishGame()">
+                                <div class="emoji">🏁</div>
+                                <h4>Fine Gioco</h4>
+                                <p>"Ho finito, mostrami i risultati!"</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            wrongBranchScenario() {
+                this.gameContent.innerHTML = `
+                    <div class="section danger-section">
+                        <h2>😱 SCENARIO: COMMIT NEL BRANCH SBAGLIATO</h2>
+                        <p><strong>Situazione:</strong> Hai fatto un commit nel branch main ma doveva andare in feature!</p>
+
+                        <div class="terminal">
+                            <p># Ops! Eri su main invece che su feature</p>
+                            <p>$ git commit -m "Nuova funzionalità importante"</p>
+                            <p>[main a1b2c3d] Nuova funzionalità importante</p>
+                            <br>
+                            <p class="error">😱 PANICO! Era destinato al branch feature!</p>
+                        </div>
+
+                        <h3>🔧 SOLUZIONI:</h3>
+                        <p>Quale comando usi per rimuovere il commit da main ma mantenere le modifiche?</p>
+
+                        <div class="quiz-option" onclick="this.classList.add('correct'); game.showFeedback('✅ PERFETTO! --soft mantiene i file in staging, pronti per essere committati altrove.', 'success'); game.addScore(30); setTimeout(() => game.wrongBranchSolution(), 2000)">
+                            a) git reset --soft HEAD~1
+                        </div>
+                        <div class="quiz-option" onclick="this.classList.add('incorrect'); game.showFeedback('❌ PERICOLOSO! --hard cancellerebbe anche le modifiche!', 'error')">
+                            b) git reset --hard HEAD~1
+                        </div>
+                        <div class="quiz-option" onclick="this.classList.add('correct'); game.showFeedback('✅ BUONO! Mantiene i file ma li toglie dallo staging.', 'success'); game.addScore(25); setTimeout(() => game.wrongBranchSolution(), 2000)">
+                            c) git reset HEAD~1
+                        </div>
+
+                        <div id="feedback"></div>
+                    </div>
+                `;
+            }
+
+            wrongBranchSolution() {
+                this.gameContent.innerHTML = `
+                    <div class="section success-section">
+                        <h2>✅ PROBLEMA RISOLTO!</h2>
+
+                        <h3>🔧 Procedura Completa:</h3>
+                        <div class="terminal">
+                            <p># 1. Rimuovi il commit ma mantieni le modifiche</p>
+                            <p>$ git reset --soft HEAD~1</p>
+                            <br>
+                            <p># 2. Vai nel branch corretto (o crealo)</p>
+                            <p>$ git checkout -b feature</p>
+                            <p>Switched to a new branch 'feature'</p>
+                            <br>
+                            <p># 3. Rifai il commit nel branch giusto</p>
+                            <p>$ git commit -m "Nuova funzionalità importante"</p>
+                            <p class="success">[feature a1b2c3d] Nuova funzionalità importante</p>
+                        </div>
+
+                        <div class="tips">
+                            <h4>📚 TIPI DI RESET:</h4>
+                            <ul>
+                                <li><code>--soft</code>: Rimuove commit, mantiene file in staging ✅</li>
+                                <li><code>--mixed</code> (default): Rimuove commit, mantiene file non staged</li>
+                                <li><code>--hard</code>: PERICOLOSO - cancella tutto! ☠️</li>
+                            </ul>
+                        </div>
+
+                        <button class="btn" onclick="game.emergencyScenarios()">⬅️ Torna agli Scenari</button>
+                    </div>
+                `;
+            }
+
+            wrongPushScenario() {
+                this.gameContent.innerHTML = `
+                    <div class="section danger-section">
+                        <h2>🔥 SCENARIO: PUSH DI CREDENZIALI</h2>
+                        <p><strong>😰 OH NO!</strong> Hai fatto push di credenziali/password/token in un file!</p>
+
+                        <div class="terminal">
+                            <p>$ git add config.js</p>
+                            <p>$ git commit -m "Aggiunta configurazione"</p>
+                            <p>$ git push origin main</p>
+                            <br>
+                            <p class="error">💀 DISASTRO! Il file conteneva le password del database!</p>
+                        </div>
+
+                        <h3>🚨 PROTOCOLLO DI EMERGENZA:</h3>
+                        <ol style="margin: 15px 0; padding-left: 30px;">
+                            <li><strong>🔐 PRIORITÀ ASSOLUTA:</strong> Cambia immediatamente le credenziali compromesse!</li>
+                            <li>🧹 Rimuovi il commit problematico</li>
+                            <li>🔄 Forza il push per sovrascrivere la storia</li>
+                            <li>📢 Avvisa il team (se necessario)</li>
+                        </ol>
+
+                        <div class="tips">
+                            <h4>⚠️ IMPORTANTE:</h4>
+                            <p>Anche se rimuovi il file, le credenziali restano nella storia di Git!<br>
+                            Quindi DEVI sempre cambiare le password compromise.</p>
+                        </div>
+
+                        <h3>🔧 Quale approccio usi?</h3>
+
+                        <div class="quiz-option" onclick="this.classList.add('correct'); game.showFeedback('✅ SICURO! Prima la sicurezza, poi la pulizia.', 'success'); game.addScore(40); setTimeout(() => game.wrongPushSolution(), 2000)">
+                            a) Prima cambiare le password, poi git reset + force push
+                        </div>
+                        <div class="quiz-option" onclick="this.classList.add('correct'); game.showFeedback('✅ BUONO! Sicuro e preserva la storia.', 'success'); game.addScore(30); setTimeout(() => game.wrongPushSolution(), 2000)">
+                            b) Cambiare le password, poi git revert
+                        </div>
+                        <div class="quiz-option" onclick="this.classList.add('incorrect'); game.showFeedback('❌ MAI ignorare problemi di sicurezza!', 'error')">
+                            c) Ignorare, tanto nessuno se ne accorge
+                        </div>
+
+                        <div id="feedback"></div>
+                    </div>
+                `;
+            }
+
+            wrongPushSolution() {
+                this.gameContent.innerHTML = `
+                    <div class="section danger-section">
+                        <h2>🛡️ RECOVERY DA PUSH PERICOLOSO</h2>
+
+                        <h3>📋 PROCEDURA COMPLETA:</h3>
+
+                        <div class="terminal">
+                            <p class="error"># 🚨 STEP 1: SICUREZZA PRIMA DI TUTTO!</p>
+                            <p># Cambia immediatamente le credenziali compromesse!</p>
+                            <br>
+                            <p># 🧹 STEP 2: RIMUOVI IL COMMIT</p>
+                            <p>$ git log --oneline -3</p>
+                            <p>a1b2c3d Aggiunta configurazione  ← QUESTO!</p>
+                            <p>d4e5f6g Commit precedente</p>
+                            <br>
+                            <p>$ git reset --hard HEAD~1</p>
+                            <p>HEAD is now at d4e5f6g Commit precedente</p>
+                            <br>
+                            <p># 🔄 STEP 3: FORZA IL PUSH (ATTENZIONE!)</p>
+                            <p>$ git push --force-with-lease origin main</p>
+                            <p class="warning">+ a1b2c3d...d4e5f6g main -> main (forced update)</p>
+                        </div>
+
+                        <div class="tips">
+                            <h4>⚠️ ALTERNATIVE PIÙ SICURE:</h4>
+                            <ul>
+                                <li><code>git revert</code>: Crea nuovo commit che annulla quello sbagliato</li>
+                                <li><code>--force-with-lease</code>: Più sicuro di <code>--force</code></li>
+                                <li>Coordinare con il team prima di modificare la storia</li>
+                            </ul>
+                        </div>
+
+                        <div class="tips">
+                            <h4>🎯 PREVENZIONE:</h4>
+                            <ul>
+                                <li>Usa file <code>.env</code> per credenziali</li>
+                                <li>Aggiungi <code>.env</code> al <code>.gitignore</code></li>
+                                <li>Non committare mai file di configurazione con credenziali</li>
+                                <li>Usa servizi come GitHub Secrets per CI/CD</li>
+                            </ul>
+                        </div>
+
+                        <button class="btn" onclick="game.emergencyScenarios()">⬅️ Torna agli Scenari</button>
+                    </div>
+                `;
+            }
+
+            deletedFilesScenario() {
+                this.gameContent.innerHTML = `
+                    <div class="section danger-section">
+                        <h2>💀 SCENARIO: FILE CANCELLATI</h2>
+                        <p><strong>😱 PANICO!</strong> Hai cancellato per sbaglio file importanti!</p>
+
+                        <div class="terminal">
+                            <p>$ rm important_file.txt</p>
+                            <p>$ git status</p>
+                            <p class="error">deleted: important_file.txt</p>
+                            <br>
+                            <p class="error">😭 NOO! Era un file super importante!</p>
+                        </div>
+
+                        <h3>🔍 DIAGNOSI: Dove si trova il file?</h3>
+                        <p>La strategia di recovery dipende da dove era il file:</p>
+
+                        <div class="scenario-grid">
+                            <div class="scenario-card" onclick="game.fileRecovery('filesystem')">
+                                <div class="emoji">📁</div>
+                                <h4>Solo Filesystem</h4>
+                                <p>Cancellato solo dal disco</p>
+                            </div>
+                            <div class="scenario-card" onclick="game.fileRecovery('staged')">
+                                <div class="emoji">🗑️</div>
+                                <h4>In Staging</h4>
+                                <p>Cancellato e staged</p>
+                            </div>
+                            <div class="scenario-card" onclick="game.fileRecovery('committed')">
+                                <div class="emoji">💾</div>
+                                <h4>Da Commit</h4>
+                                <p>Era in un commit precedente</p>
+                            </div>
+                            <div class="scenario-card" onclick="game.fileRecovery('unknown')">
+                                <div class="emoji">🔍</div>
+                                <h4>Non So!</h4>
+                                <p>Aiuto, non ricordo!</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            fileRecovery(scenario) {
+                let solution = '';
+                let explanation = '';
+
+                switch(scenario) {
+                    case 'filesystem':
+                        solution = 'git checkout -- important_file.txt';
+                        explanation = 'Ripristina il file dalla staging area o dall\'ultimo commit.';
+                        break;
+                    case 'staged':
+                        solution = 'git reset HEAD important_file.txt && git checkout -- important_file.txt';
+                        explanation = 'Prima rimuovi dalla staging, poi ripristina il file.';
+                        break;
+                    case 'committed':
+                        solution = 'git checkout <commit_hash> -- important_file.txt';
+                        explanation = 'Ripristina il file da un commit specifico.';
+                        break;
+                    case 'unknown':
+                        solution = 'git log --follow -- important_file.txt';
+                        explanation = 'Trova la storia del file, poi usa git checkout per ripristinarlo.';
+                        break;
+                }
+
+                this.gameContent.innerHTML = `
+                    <div class="section success-section">
+                        <h2>🛠️ RECOVERY FILE: ${scenario.toUpperCase()}</h2>
+
+                        <h3>💡 Soluzione:</h3>
+                        <div class="terminal">
+                            <p>$ ${solution}</p>
+                            <p class="success">✅ File ripristinato!</p>
+                        </div>
+
+                        <p><strong>Spiegazione:</strong> ${explanation}</p>
+
+                        <h3>🔍 IL SALVAVITA: git reflog</h3>
+                        <div class="terminal">
+                            <p>$ git reflog</p>
+                            <p>a1b2c3d HEAD@{0}: commit: Ultimo commit</p>
+                            <p>d4e5f6g HEAD@{1}: commit: Commit con il file</p>
+                            <p>h7i8j9k HEAD@{2}: checkout: moving from feature to main</p>
+                            <br>
+                            <p># Ripristina da qualsiasi punto!</p>
+                            <p>$ git checkout d4e5f6g -- important_file.txt</p>
+                        </div>
+
+                        <div class="tips">
+                            <h4>🎓 LESSON LEARNED:</h4>
+                            <ul>
+                                <li><code>git reflog</code> mostra TUTTO quello che hai fatto</li>
+                                <li>È quasi impossibile perdere definitivamente lavoro committato</li>
+                                <li>Git mantiene la storia per ~30 giorni anche dopo cancellazioni</li>
+                                <li>Fai commit frequenti = backup automatici!</li>
+                            </ul>
+                        </div>
+
+                        <button class="btn" onclick="game.emergencyScenarios()">⬅️ Torna agli Scenari</button>
+                    </div>
+                `;
+                this.addScore(35);
+            }
+
+            undoCommitScenario() {
+                this.gameContent.innerHTML = `
+                    <div class="section">
+                        <h2>⚡ SCENARIO: ANNULLARE L'ULTIMO COMMIT</h2>
+                        <p>Hai appena fatto un commit ma c'è un errore. Come lo annulli?</p>
+
+                        <div class="terminal">
+                            <p>$ git commit -m "Funzione login completato"</p>
+                            <p>[main a1b2c3d] Funzione login completato</p>
+                            <br>
+                            <p class="error">😅 Ops! C'è un bug nel codice!</p>
+                        </div>
+
+                        <h3>🎯 SCEGLI LA STRATEGIA:</h3>
+
+                        <div class="scenario-grid">
+                            <div class="scenario-card" onclick="game.undoStrategy('soft')">
+                                <div class="emoji">🔄</div>
+                                <h4>Reset Soft</h4>
+                                <p>Mantieni modifiche in staging</p>
+                            </div>
+                            <div class="scenario-card" onclick="game.undoStrategy('mixed')">
+                                <div class="emoji">📝</div>
+                                <h4>Reset Mixed</h4>
+                                <p>Mantieni modifiche non staged</p>
+                            </div>
+                            <div class="scenario-card" onclick="game.undoStrategy('amend')">
+                                <div class="emoji">✏️</div>
+                                <h4>Amend</h4>
+                                <p>Modifica l'ultimo commit</p>
+                            </div>
+                            <div class="scenario-card" onclick="game.undoStrategy('revert')">
+                                <div class="emoji">🔀</div>
+                                <h4>Revert</h4>
+                                <p>Nuovo commit che annulla</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            undoStrategy(strategy) {
+                let content = '';
+                let score = 0;
+
+                switch(strategy) {
+                    case 'soft':
+                        content = `
+                            <h3>🔄 RESET --SOFT</h3>
+                            <div class="terminal">
+                                <p>$ git reset --soft HEAD~1</p>
+                                <p class="success">✅ Commit rimosso, file ancora in staging</p>
+                                <br>
+                                <p># Ora puoi rifare il commit corretto</p>
+                                <p>$ git commit -m "Funzione login completata (con fix)"</p>
+                            </div>
+                            <p><strong>Uso:</strong> Quando vuoi rifare il commit con modifiche minime.</p>
+                        `;
+                        score = 25;
+                        break;
+                    case 'mixed':
+                        content = `
+                            <h3>📝 RESET --MIXED (default)</h3>
+                            <div class="terminal">
+                                <p>$ git reset HEAD~1</p>
+                                <p class="success">✅ Commit rimosso, file non in staging</p>
+                                <br>
+                                <p># Devi rifare git add e commit</p>
+                                <p>$ git add .</p>
+                                <p>$ git commit -m "Funzione login completata (fixed)"</p>
+                            </div>
+                            <p><strong>Uso:</strong> Quando vuoi rivedere i file prima del nuovo commit.</p>
+                        `;
+                        score = 20;
+                        break;
+                    case 'amend':
+                        content = `
+                            <h3>✏️ COMMIT --AMEND</h3>
+                            <div class="terminal">
+                                <p># Fai le correzioni ai file</p>
+                                <p>$ git add fixed_file.js</p>
+                                <p>$ git commit --amend -m "Funzione login completata"</p>
+                                <p class="success">✅ Commit modificato!</p>
+                            </div>
+                            <p><strong>Uso:</strong> Per modificare l'ultimo commit (messaggio o file).</p>
+                            <div class="tips">
+                                <h4>⚠️ ATTENZIONE:</h4>
+                                <p>Non usare --amend su commit già pushati in repository condivisi!</p>
+                            </div>
+                        `;
+                        score = 30;
+                        break;
+                    case 'revert':
+                        content = `
+                            <h3>🔀 GIT REVERT</h3>
+                            <div class="terminal">
+                                <p>$ git revert HEAD</p>
+                                <p>[main b2c3d4e] Revert "Funzione login completato"</p>
+                                <p class="success">✅ Nuovo commit che annulla quello precedente</p>
+                            </div>
+                            <p><strong>Uso:</strong> Sicuro per repository condivisi - mantiene la storia.</p>
+                            <div class="tips">
+                                <h4>✅ VANTAGGI:</h4>
+                                <ul>
+                                    <li>Non modifica la storia esistente</li>
+                                    <li>Sicuro per repository condivisi</li>
+                                    <li>Tracciabile e reversibile</li>
+                                </ul>
+                            </div>
+                        `;
+                        score = 20;
+                        break;
+                }
+
+                this.gameContent.innerHTML = `
+                    <div class="section success-section">
+                        <h2>⚡ STRATEGIA: ${strategy.toUpperCase()}</h2>
+                        ${content}
+
+                        <div class="tips">
+                            <h4>📚 RIASSUNTO COMANDI UNDO:</h4>
+                            <ul>
+                                <li><code>git reset --soft HEAD~1</code>: Rimuove commit, mantieni staging</li>
+                                <li><code>git reset HEAD~1</code>: Rimuove commit, togli da staging</li>
+                                <li><code>git commit --amend</code>: Modifica ultimo commit</li>
+                                <li><code>git revert HEAD</code>: Nuovo commit che annulla</li>
+                            </ul>
+                        </div>
+
+                        <button class="btn" onclick="game.emergencyScenarios()">⬅️ Torna agli Scenari</button>
+                    </div>
+                `;
+                this.addScore(score);
+            }
+
+            dangerousCommandsLesson() {
+                this.gameContent.innerHTML = `
+                    <div class="section danger-section">
+                        <h2>☠️ COMANDI CHE POSSONO ROVINARE LA TUA CARRIERA</h2>
+                        <p>Alcuni comandi Git sono così pericolosi che possono causare perdite permanenti di dati!</p>
+
+                        <h3>💀💀💀 LIVELLO: MORTALE</h3>
+
+                        <div class="code-block">
+<span class="error">git reset --hard</span>
+• Cancella TUTTO: modifiche non committate, staging area
+• Non c'è modo di recuperare le modifiche perse
+• Usa solo se sei SICURO al 100%
+
+<span class="error">git push --force</span>
+• Sovrascrive la storia del repository remoto
+• Può cancellare il lavoro di altri sviluppatori
+• Può causare perdita permanente di dati
+• MAI usare in progetti condivisi senza coordinamento
+
+<span class="error">git clean -fd</span>
+• Cancella tutti i file non tracciati
+• Include directory intere
+• Non è reversibile
+                        </div>
+
+                        <h3>⚡⚡ LIVELLO: MOLTO PERICOLOSO</h3>
+
+                        <div class="code-block">
+<span class="warning">git rebase -i</span> (interactive rebase)
+• Riscrive la storia dei commit
+• Può creare conflitti complessi
+• Se fatto male, può perdere commit
+
+<span class="warning">git branch -D</span>
+• Cancella un branch forzatamente
+• Non controlla se ci sono commit non merged
+• Perdita potenziale di lavoro
+                        </div>
+
+                        <button class="btn btn-info" onclick="game.showSafeAlternatives()">🛡️ Mostra Alternative Sicure</button>
+                        <button class="btn" onclick="game.emergencyScenarios()">⬅️ Torna agli Scenari</button>
+                    </div>
+                `;
+                this.addScore(50);
+            }
+
+            showSafeAlternatives() {
+                this.gameContent.innerHTML = `
+                    <div class="section success-section">
+                        <h2>🛡️ ALTERNATIVE SICURE</h2>
+
+                        <h3>✅ Invece dei Comandi Pericolosi:</h3>
+
+                        <div class="code-block">
+<span class="success">Invece di reset --hard:</span>
+• git stash (salva le modifiche)
+• git checkout -- file_specifico (solo un file)
+• git reset --soft HEAD~1 (mantieni modifiche)
+
+<span class="success">Invece di push --force:</span>
+• git push --force-with-lease (verifica prima)
+• git revert (annulla con nuovo commit)
+• Coordina con il team
+
+<span class="success">Invece di branch -D:</span>
+• git branch -d (cancella solo se merged)
+• git merge --no-ff prima di cancellare
+
+<span class="success">Invece di clean -fd:</span>
+• git clean -n (dry-run per vedere cosa cancella)
+• git stash -u (includi file untracked)
+                        </div>
+
+                        <h3>🔍 COMANDI PER VERIFICARE PRIMA:</h3>
+
+                        <div class="code-block">
+• git status (cosa cambierà)
+• git diff (vedere le differenze)
+• git log --oneline (vedere i commit)
+• git branch -a (vedere tutti i branch)
+• git reflog (cronologia completa)
+                        </div>
+
+                        <div class="tips">
+                            <h4>💡 REGOLA D'ORO:</h4>
+                            <p><strong>PRIMA DI USARE COMANDI DISTRUTTIVI:</strong></p>
+                            <ol>
+                                <li>💾 Fai sempre un backup (git stash o git branch backup)</li>
+                                <li>🔍 Controlla cosa stai per fare (git status, git diff)</li>
+                                <li>🤔 Chiediti: "Posso recuperare se va male?"</li>
+                                <li>👥 Se lavori in team, coordina sempre!</li>
+                            </ol>
+                            <p><strong>La prudenza non è codardia, è professionalità! 🎯</strong></p>
+                        </div>
+
+                        <button class="btn" onclick="game.emergencyScenarios()">⬅️ Torna agli Scenari</button>
+                    </div>
+                `;
+            }
+
+            finishGame() {
+                this.gameContent.innerHTML = `
+                    <div class="section success-section">
+                        <h2>🏆 CONGRATULAZIONI!</h2>
+                        <h3>HAI COMPLETATO GIT MASTER QUEST!</h3>
+
+                        <div class="stats" style="font-size: 1.5em; text-align: center; margin: 30px 0;">
+                            <div class="score glow">PUNTEGGIO FINALE: ${this.score}</div>
+                        </div>
+
+                        <h3>🎯 COSA HAI IMPARATO:</h3>
+                        <ul style="margin: 15px 0; padding-left: 30px;">
+                            <li>✅ Comandi base di Git (init, add, commit, status)</li>
+                            <li>✅ Branching e merging</li>
+                            <li>✅ Risoluzione di conflitti</li>
+                            <li>✅ Scenari di emergenza e recovery</li>
+                            <li>✅ Comandi pericolosi da evitare</li>
+                            <li>✅ Best practices per la sicurezza</li>
+                        </ul>
+
+                        <h3>🏅 LIVELLO RAGGIUNTO:</h3>
+                        <div style="text-align: center; font-size: 1.3em; margin: 20px 0;">
+                            ${this.getFinalLevel()}
+                        </div>
+
+                        <h3>🚀 PROSSIMI PASSI PER DIVENTARE UN VERO ESPERTO:</h3>
+                        <ul style="margin: 15px 0; padding-left: 30px;">
+                            <li>🔄 Pratica il workflow Git Flow o GitHub Flow</li>
+                            <li>🏷️ Impara i Git tags per le release</li>
+                            <li>🔍 Studia git bisect per trovare bug</li>
+                            <li>🎯 Pratica git cherry-pick per commit selettivi</li>
+                            <li>🛠️ Configura Git hooks per automatizzazioni</li>
+                            <li>📖 Leggi "Pro Git" book (gratuito online)</li>
+                            <li>💼 Contribuisci a progetti open source su GitHub</li>
+                        </ul>
+
+                        <div class="tips">
+                            <h4>📚 RISORSE UTILI:</h4>
+                            <ul>
+                                <li><a href="https://git-scm.com/book" target="_blank">Pro Git Book (Gratuito)</a></li>
+                                <li><a href="https://learngitbranching.js.org/" target="_blank">Learn Git Branching (Interattivo)</a></li>
+                                <li><a href="https://github.com/skills" target="_blank">GitHub Skills</a></li>
+                                <li><a href="https://www.atlassian.com/git/tutorials" target="_blank">Atlassian Git Tutorials</a></li>
+                            </ul>
+                        </div>
+
+                        <div style="text-align: center; margin: 30px 0;">
+                            <button class="btn" onclick="location.reload()">🎮 Gioca di Nuovo</button>
+                            <button class="btn btn-info" onclick="game.showCertificate()">📜 Mostra Certificato</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            getFinalLevel() {
+                if (this.score >= 200) {
+                    return '<span class="success">🏆 GIT MASTER - Sei pronto per qualsiasi sfida!</span>';
+                } else if (this.score >= 150) {
+                    return '<span class="info">🥈 GIT EXPERT - Ottime competenze, continua così!</span>';
+                } else if (this.score >= 100) {
+                    return '<span class="warning">🥉 GIT INTERMEDIATE - Buone basi, pratica ancora!</span>';
+                } else {
+                    return '<span class="error">📚 GIT BEGINNER - Ripassa i fondamentali!</span>';
+                }
+            }
+
+            showCertificate() {
+                const date = new Date().toLocaleDateString('it-IT');
+                this.gameContent.innerHTML = `
+                    <div class="section" style="text-align: center; border: 3px solid #00ff88; background: rgba(0,255,136,0.1);">
+                        <h2>📜 CERTIFICATO DI COMPLETAMENTO</h2>
+
+                        <div style="margin: 30px 0; font-size: 1.2em;">
+                            <p><strong>Si certifica che</strong></p>
+                            <h3 style="color: #00ff88; margin: 20px 0;">GIT MASTER QUEST PLAYER</h3>
+                            <p><strong>ha completato con successo</strong></p>
+                            <h3 style="color: #ffaa00;">🎮 GIT MASTER QUEST</h3>
+                            <p><strong>raggiungendo un punteggio di</strong></p>
+                            <h2 style="color: #00ff88;">${this.score} PUNTI</h2>
+                            <p><strong>e ottenendo il livello</strong></p>
+                            <div style="margin: 20px 0;">${this.getFinalLevel()}</div>
+                        </div>
+
+                        <div style="margin: 30px 0; font-size: 0.9em; color: #888;">
+                            <p>Data completamento: ${date}</p>
+                            <p>Git Master Quest - Tutorial Interattivo</p>
+                            <p>🚀 "La conoscenza di Git apre le porte dell'universo del codice" 🚀</p>
+                        </div>
+
+                        <button class="btn" onclick="game.finishGame()">⬅️ Torna ai Risultati</button>
+                    </div>
+                `;
+            }
+
+            showFeedback(message, type) {
+                const feedbackElement = document.getElementById('feedback');
+                if (feedbackElement) {
+                    feedbackElement.innerHTML = `<div class="output ${type}">${message}</div>`;
+                }
+            }
+        }
+
+        // Avvia il gioco quando la pagina è caricata
+        let game;
+        window.addEventListener('DOMContentLoaded', () => {
+            game = new GitMasterQuest();
+        });
+    </script>
+</body>
+</html>
